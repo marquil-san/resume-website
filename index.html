@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Marquil-san | Portfolio</title>
+    <meta name="description" content="Frozen OS Portfolio" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <!-- Background overlay for moody depth -->
+    <div class="ambient-bg"></div>
+
+    <div class="os-container" id="os-container">
+      
+      <!-- 1. About Me (Top Left) -->
+      <a href="/about.html" class="frozen-card card-about" data-card>
+        <div class="frozen-card-content">
+          <h2>About Me</h2>
+          <p>Learn more about my background and journey.</p>
+        </div>
+      </a>
+
+      <!-- 2. GitHub (Center) -->
+      <div class="frozen-card card-github" data-card>
+        <div class="frozen-card-content">
+          <div class="profile-section">
+            <a href="https://github.com/marquil-san" target="_blank" class="pfp-link frozen-element" data-interactive>
+              <div class="pfp-frame">
+                <img src="/assets/pfp.png" alt="marquil-san" class="pfp-image" />
+              </div>
+            </a>
+            <a href="https://github.com/marquil-san" target="_blank" class="username-link">marquil-san</a>
+          </div>
+
+          <div class="projects-list">
+            <a href="https://github.com/marquil-san/no-BS" target="_blank" class="project-btn frozen-element" data-interactive>
+              <span class="project-name">Python IDE</span>
+              <span class="project-arrow">→</span>
+            </a>
+            <a href="https://github.com/marquil-san/Pointer-Chain" target="_blank" class="project-btn frozen-element" data-interactive>
+              <span class="project-name">Pointer Chain</span>
+              <span class="project-arrow">→</span>
+            </a>
+            <a href="https://github.com/marquil-san/Concept-Cards" target="_blank" class="project-btn frozen-element" data-interactive>
+              <span class="project-name">Concept Cards</span>
+              <span class="project-arrow">→</span>
+            </a>
+            <a href="https://github.com/marquil-san/Device_ID-Spoofer" target="_blank" class="project-btn frozen-element" data-interactive>
+              <span class="project-name">Device ID Spoofer</span>
+              <span class="project-arrow">→</span>
+            </a>
+            <a href="https://github.com/marquil-san?tab=repositories" target="_blank" class="project-btn project-more frozen-element" data-interactive>
+              <span class="project-name">More Projects?</span>
+              <span class="project-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. YouTube (Bottom Left) -->
+      <div class="frozen-card card-youtube" data-card>
+        <div class="frozen-card-content">
+          <h2>YouTube</h2>
+          <p>Watch my latest videos and development updates.</p>
+          <a href="https://www.youtube.com/@marquil-san" target="_blank" class="action-btn frozen-element" data-interactive>Open Channel</a>
+        </div>
+      </div>
+
+     <!-- 4. Contacts (Bottom Right) -->
+<div class="frozen-card card-contacts" data-card>
+  <div class="frozen-card-content">
+    <h2>Contacts</h2>
+    <div class="contact-list">
+      <div class="contact-btn frozen-element" data-interactive>
+        <span class="contact-label">Phone</span>
+        <span class="contact-value">+91 1111111111</span>
+      </div>
+
+      <div class="contact-btn frozen-element" data-interactive>
+        <span class="contact-label">Discord</span>
+        <span class="contact-value">@dummy_dumdum</span>
+      </div>
+
+      <div class="contact-btn frozen-element" data-interactive>
+        <span class="contact-label">Email</span>
+        <span class="contact-value">hhhhhh@gmail.com</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Crack Ripple Template -->
+    <div id="crack-ripple-container" class="pointer-events-none"></div>
+
+    <script type="module" src="/src/js/main.js"></script>
+  </body>
+</html>

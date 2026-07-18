@@ -1,0 +1,471 @@
+/* =========================================
+   VARIABLES & BASE STYLES
+   ========================================= */
+:root {
+  /* Color Palette */
+  --bg-deep: #050a14;
+  --bg-navy: #0a1122;
+  --ice-blue: rgba(132, 204, 255, 0.15);
+  --ice-cyan: rgba(0, 240, 255, 0.4);
+  --text-primary: #e0f0ff;
+  --text-secondary: #8aa6c1;
+  --glass-bg: rgba(10, 18, 35, 0.4);
+  --glass-border: rgba(132, 204, 255, 0.2);
+  --glass-highlight: rgba(255, 255, 255, 0.1);
+  --shadow-deep: rgba(0, 0, 0, 0.6);
+  
+  /* Font */
+  --font-main: 'Inter', sans-serif;
+  
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  background-color: transparent; /* Allows future canvas behind */
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  overflow: hidden; /* Prevent scrolling, OS feel */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Ambient Background (until Canvas is added) */
+.ambient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, var(--bg-navy) 0%, var(--bg-deep) 100%);
+  z-index: -2;
+  pointer-events: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.text-center { text-align: center; }
+.mb-4 { margin-bottom: 1rem; }
+.inline-block { display: inline-block; }
+
+/* =========================================
+   LAYOUT & CONTAINER
+   ========================================= */
+.os-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 1500px;
+  
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr 1fr;
+  padding: 2rem;
+  gap: 1rem;
+}
+.os-container.single-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Base card positioning logic */
+.frozen-card {
+  position: relative;
+  will-change: transform;
+  transform-style: preserve-3d;
+  /* Hardware accel */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Desktop layout positions (CSS Grid ensures no overlapping) */
+.card-about {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  justify-self: center;
+  margin-top: 2rem;
+  width: 260px;
+}
+
+.card-github {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: center;
+  width: 340px;
+  z-index: 10;
+}
+
+.card-youtube {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  justify-self: center;
+  margin-bottom: 2rem;
+  width: 280px;
+}
+
+.card-contacts {
+  grid-column: 3;
+  grid-row: 2;
+  align-self: end;
+  justify-self: center;
+  margin-bottom: 2rem;
+  width: 300px;
+}
+
+.card-resume {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: start;
+  justify-self: center;
+  margin-top: 2rem;
+  width: 260px;
+}
+
+.card-about-full {
+  position: relative;
+  width: 400px;
+  max-width: 90vw;
+}
+
+/* =========================================
+   FROZEN GLASS MATERIAL
+   ========================================= */
+.frozen-card, .frozen-element {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 
+    0 10px 30px var(--shadow-deep),
+    inset 0 1px 1px var(--glass-highlight),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden; /* Contains the internal ice */
+  position: relative;
+  transition: all 0.5s var(--ease-out);
+}
+
+.frozen-card-content {
+  padding: 1.75rem;
+  position: relative;
+  z-index: 10; /* Above the ice layers */
+}
+
+/* =========================================
+   INTERACTION: FROST BORDER & INTERNAL ICE
+   ========================================= */
+
+/* The frost border that grows on hover */
+.frozen-card::before, .frozen-element::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: inset 0 0 0 0 var(--ice-cyan);
+  opacity: 0;
+  transition: box-shadow 0.6s var(--ease-out), opacity 0.6s var(--ease-out);
+}
+
+/* Hover States - Cards */
+.frozen-card.is-hovered {
+  background: rgba(5, 10, 20, 0.6); /* darken */
+  backdrop-filter: blur(20px); /* increase clarity/blur */
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 20px 40px var(--shadow-deep),
+    inset 0 1px 1px var(--glass-highlight),
+    inset 0 0 30px rgba(0, 0, 0, 0.7);
+  border-color: rgba(132, 204, 255, 0.4);
+}
+
+.frozen-card.is-hovered::before, .frozen-element.is-hovered::before {
+  opacity: 1;
+  /* Simulate frost creeping in */
+  box-shadow: inset 0 0 15px 2px var(--ice-cyan);
+}
+
+/* Click / Active State */
+.frozen-card.is-active, .frozen-element.is-active {
+  transform: scale(0.97) !important; /* Managed by JS, this is fallback */
+  transition: transform 0.1s var(--ease-spring);
+}
+.frozen-card.is-active::before, .frozen-element.is-active::before {
+  box-shadow: inset 0 0 25px 4px var(--ice-cyan);
+  transition: box-shadow 0.1s ease;
+}
+
+/* Internal Ice Texture Layers (injected by JS) */
+.ice-layer {
+  position: absolute;
+  top: -20%; left: -20%; width: 140%; height: 140%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  transition: opacity 2s ease-in-out;
+}
+.ice-layer.active {
+  opacity: 0.15; /* subtle base */
+}
+.is-hovered .ice-layer.active {
+  opacity: 0.35; /* intensifies on hover */
+}
+
+
+/* =========================================
+   SPECIFIC COMPONENT STYLES
+   ========================================= */
+
+/* Action Buttons (YouTube, Resume) */
+.action-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+}
+.action-btn:hover {
+  color: #fff;
+}
+
+/* GitHub Profile Section */
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.pfp-link {
+  border-radius: 50%;
+  padding: 8px; /* Thickness of the glass frame */
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.pfp-frame {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
+}
+
+.pfp-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.pfp-link.is-hovered .pfp-image {
+  transform: scale(1.05);
+}
+
+.username-link {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  transition: color 0.3s ease;
+}
+.username-link:hover {
+  color: var(--ice-cyan);
+}
+
+/* GitHub Projects */
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.project-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+}
+
+.project-name {
+  font-weight: 500;
+}
+
+.project-arrow {
+  opacity: 0.5;
+  transition: transform 0.3s var(--ease-spring), opacity 0.3s ease;
+}
+
+.project-btn.is-hovered .project-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+  color: #fff;
+}
+.project-btn.is-hovered .project-name {
+  color: #fff;
+}
+
+.project-more {
+  margin-top: 0.5rem;
+  background: rgba(132, 204, 255, 0.05);
+}
+
+/* Contacts */
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-btn {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.contact-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.contact-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
+  word-break: break-all;
+}
+
+/* Copy Confirmation tooltip */
+.copy-btn {
+  position: relative;
+}
+.copy-btn::after {
+  content: 'Copied!';
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%) scale(0.8);
+  background: var(--ice-cyan);
+  color: #000;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s var(--ease-spring);
+}
+.copy-btn.copied::after {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+
+/* =========================================
+   CRACK RIPPLE EFFECT
+   ========================================= */
+.crack-ripple {
+  position: fixed;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 1;
+  pointer-events: none;
+  z-index: 9999;
+  /* Crystal-like sharp shadow */
+  box-shadow: 0 0 10px 2px var(--ice-cyan), inset 0 0 5px var(--ice-cyan);
+  animation: ripple-anim 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes ripple-anim {
+  0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; border-width: 3px; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; border-width: 0px; }
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN (MOBILE)
+   ========================================= */
+@media (max-width: 1024px), (max-height: 680px) {
+  .os-container:not(.single-centered) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2rem 1rem;
+    height: auto;
+    min-height: 100%;
+    /* Disable perspective on mobile for standard scrolling */
+    perspective: none;
+  }
+
+  .os-container:not(.single-centered) .frozen-card {
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: 400px;
+    margin: 0 0 1.5rem 0 !important;
+    transform: none !important; /* Disable 3D transforms on scroll */
+  }
+}
